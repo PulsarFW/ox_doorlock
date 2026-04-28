@@ -61,8 +61,17 @@ local function pickLock(entity)
 
 	if rand == 1 then
 		TriggerServerEvent('ox_doorlock:breakLockpick')
-		lib.notify({ type = 'error', description = locale('lockpick_broke') })
+
+		if Config.NotifyType == 'ox' then
+			lib.notify({
+				type = 'error',
+				description = locale('lockpick_broke')
+			})
+		elseif Config.NotifyType == 'sandbox' then
+			exports['pulsar-hud']:Notification("error", locale('lockpick_broke'))
+		end
 	end
+
 
 	StopEntityAnim(cache.ped, 'pick_door', animDict, 0)
 	RemoveAnimDict(animDict)
@@ -101,7 +110,14 @@ local isAddingDoorlock = false
 
 RegisterNUICallback('notify', function(data, cb)
 	cb(1)
-	lib.notify({ title = data })
+
+	if Config.NotifyType == 'ox' then
+		lib.notify({
+			title = data
+		})
+	elseif Config.NotifyType == 'sandbox' then
+		exports['pulsar-hud']:Notification("success", data)
+	end
 end)
 
 RegisterNUICallback('createDoor', function(data, cb)
@@ -206,7 +222,6 @@ RegisterNUICallback('createDoor', function(data, cb)
 	end
 
 	isAddingDoorlock = false
-
 	TriggerServerEvent('ox_doorlock:editDoorlock', data.id or false, data)
 	table.wipe(tempData)
 end)

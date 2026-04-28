@@ -3,12 +3,18 @@ import { StoreState } from '../store';
 
 // Converts groups data into array format
 export const convertData = (data: DoorColumn) => {
-  let newGroupsData: { name: string; grade: number }[] = [];
+  let newGroupsData: { name: string; grade: number; workplace?: string | null; permissions?: string | null; onduty?: boolean | null }[] = [];
   if (data.groups) {
     const doorGroupsData = Object.entries(data.groups);
     for (let i = 0; i < doorGroupsData.length; i++) {
       const groupObj = doorGroupsData[i];
-      newGroupsData[i] = { name: groupObj[0], grade: groupObj[1] };
+      newGroupsData[i] = { 
+        name: groupObj[0], 
+        grade: groupObj[1], 
+        workplace: (data as any).workplace || '', 
+        permissions: (data as any).permissions || '',
+        onduty: (data as any).onduty || false
+      };
     }
   }
   return {

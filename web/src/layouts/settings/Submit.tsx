@@ -60,8 +60,12 @@ const Submit: React.FC = () => {
     if (data.groups && data.groups.length > 0) {
       const groupsObj: { [key: string]: number } = {};
 
+      // Extract workplace/permissions/onduty from group fields before we convert to object
       for (let i = 0; i < data.groups.length; i++) {
-        const groupField = data.groups[i];
+        const groupField = data.groups[i] as any;
+        if (groupField.workplace) data.workplace = groupField.workplace;
+        if (groupField.permissions) data.permissions = groupField.permissions;
+        if (groupField.onduty !== undefined) data.onduty = groupField.onduty;
         if (groupField.name && groupField.name !== '') groupsObj[groupField.name] = groupField.grade || 0;
       }
 
@@ -106,6 +110,9 @@ const Submit: React.FC = () => {
                 items: clipboard.items,
                 characters: clipboard.characters,
                 groups: clipboard.groups,
+                workplace: clipboard.workplace,
+                permissions: clipboard.permissions,
+                onduty: clipboard.onduty,
                 maxDistance: clipboard.maxDistance,
                 doorRate: clipboard.doorRate,
                 lockSound: clipboard.lockSound,

@@ -3,18 +3,20 @@
 Config = {}
 
 ---Trigger a notification on the client when the door state is successfully updated.
-Config.Notify = false
+Config.Notify = true
+Config.NotifyType = 'pulsar' --- 'ox' | 'sandbox' | 'pulsar'
 
 ---Create a persistent notification while in-range of a door, prompting to lock/unlock.
-Config.DrawTextUI = false
+Config.DrawTextUI = true
+Config.DrawTextUIType = 'pulsar' --- 'ox' | 'sandbox' | 'pulsar'
 
 ---Set the properties used by [DrawSprite](https://docs.fivem.net/natives/?_0xE7FFAE5EBF23D890).
 Config.DrawSprite = {
-    -- Unlocked
-    [0] = { 'mpsafecracking', 'lock_open', 0, 0, 0.018, 0.018, 0, 255, 255, 255, 100 },
+    -- Unlocked (green)
+    [0] = { 'mpsafecracking', 'lock_open', 0, 0, 0.018, 0.018, 0, 0, 255, 0, 100 },
 
-    -- Locked
-    [1] = { 'mpsafecracking', 'lock_closed', 0, 0, 0.018, 0.018, 0, 255, 255, 255, 100 },
+    -- Locked (red)
+    [1] = { 'mpsafecracking', 'lock_closed', 0, 0, 0.018, 0.018, 0, 255, 0, 0, 100 },
 }
 
 ---Allow the specified ace principal to use 'command.doorlock'.
@@ -31,7 +33,9 @@ Config.CanPickUnlockedDoors = false
 
 ---An array of items that function as lockpicks.
 Config.LockpickItems = {
-    'lockpick'
+    'lockpick',
+    'adv_lockpick',
+    'lockpick_pd',
 }
 
 ---Play sounds using game audio (sound natives) instead of through NUI.

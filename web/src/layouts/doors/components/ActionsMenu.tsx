@@ -17,7 +17,7 @@ const ActionsMenu: React.FC<{ data: CellContext<DoorColumn, unknown> }> = ({ dat
   const setClipboard = useClipboard((state) => state.setClipboard);
   const setVisible = useVisibility((state) => state.setVisible);
   return (
-    <Menu position="right-start" width={200}>
+    <Menu position="right-start" width={100}>
       <Menu.Target>
         <Tooltip label="Door actions">
           <ActionIcon color="blue.4" variant="transparent">

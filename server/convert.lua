@@ -4,6 +4,67 @@ Config.DoorList = {}
 
 local utils = require 'server.utils'
 
+local function getFilesRecursively(basePath, pattern)
+	local allFiles = {}
+	local totalCount = 0
+
+	-- Get files in the base directory
+	local files, fileCount = utils.getFilesInDirectory(basePath, pattern)
+	for i = 1, fileCount do
+		totalCount = totalCount + 1
+		allFiles[totalCount] = {
+			fileName = files[i],
+			path = basePath
+		}
+	end
+
+	-- Get subdirectories
+	local subdirs = {}
+	local system = os.getenv('OS')
+	local resourcePath = GetResourcePath(cache.resource):gsub('//', '/') .. '/'
+
+	if system and system:match('Windows') then
+		-- Windows command to list directories only
+		local dir = io.popen('dir "' .. resourcePath .. basePath .. '/" /b /ad')
+		if dir then
+			for line in dir:lines() do
+				if line ~= '.' and line ~= '..' and line ~= '' then
+					subdirs[#subdirs + 1] = line
+				end
+			end
+			dir:close()
+		end
+	else
+		-- Unix/Linux command to list directories only
+		local dir = io.popen('find "' ..
+		resourcePath .. basePath .. '/" -maxdepth 1 -type d ! -path "' .. resourcePath .. basePath .. '/"')
+		if dir then
+			for line in dir:lines() do
+				local dirName = line:match('/([^/]+)$')
+				if dirName and dirName ~= '.' and dirName ~= '..' then
+					subdirs[#subdirs + 1] = dirName
+				end
+			end
+			dir:close()
+		end
+	end
+
+	-- Recursively scan subdirectories
+	for _, subdir in ipairs(subdirs) do
+		local subPath = basePath .. '/' .. subdir
+		local subFiles, subFileCount = utils.getFilesInDirectory(subPath, pattern)
+		for i = 1, subFileCount do
+			totalCount = totalCount + 1
+			allFiles[totalCount] = {
+				fileName = subFiles[i],
+				path = subPath
+			}
+		end
+	end
+
+	return allFiles, totalCount
+end
+
 local function flattenTableToArray(tbl)
 	if type(tbl) == 'table' then
 		if table.type(tbl) == 'array' then return tbl end
@@ -19,7 +80,7 @@ local function flattenTableToArray(tbl)
 end
 
 MySQL.ready(function()
-	local files, fileCount = utils.getFilesInDirectory('convert', '%.lua')
+	local files, fileCount = getFilesRecursively('convert', '%.lua')
 
 	if fileCount > 0 then
 		print(('^3Found %d nui_doorlock config files.^0'):format(fileCount))
@@ -30,8 +91,10 @@ MySQL.ready(function()
 	local queries = {}
 
 	for i = 1, fileCount do
-		local fileName = files[i]
-		local file = LoadResourceFile('ox_doorlock', ('convert/%s.lua'):format(fileName))
+		local fileInfo = files[i]
+		local fileName = fileInfo.fileName
+		local filePath = fileInfo.path
+		local file = LoadResourceFile('ox_doorlock', (filePath .. '/%s.lua'):format(fileName))
 
 		if file then
 			load(file)()
@@ -111,17 +174,17 @@ MySQL.ready(function()
 						data.coords = double[1].coords - ((double[1].coords - double[2].coords) / 2)
 					end
 
-					local name = ('%s %s'):format(fileName, k)
+					local name = ('%s %s'):format(filePath:gsub('convert/?', ''):gsub('/', '_') .. '_' .. fileName, k)
 
 					queries[size] = {
 						query = query, values = { name, json.encode(data), name }
 					}
 				end
 
-				print(('^3Loaded %d doors from convert/%s.lua.^0'):format(size, fileName))
+				print(('^3Loaded %d doors from %s/%s.lua.^0'):format(size, filePath, fileName))
 
 				if MySQL.transaction.await(queries) then
-					SaveResourceFile('ox_doorlock', ('convert/%s.lua'):format(fileName),
+					SaveResourceFile('ox_doorlock', (filePath .. '/%s.lua'):format(fileName),
 						'-- This file has already been converted for ox_doorlock and should be removed.\r\ndo return end\r\n\r\n' ..
 						file, -1)
 				end

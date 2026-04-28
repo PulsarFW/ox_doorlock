@@ -22,7 +22,7 @@ const Input: React.FC<Props> = ({ label, type, infoCircle, span, value, setValue
             label={label}
             rightSection={
               infoCircle && (
-                <Tooltip label={infoCircle} withArrow arrowSize={10} multiline width={200}>
+                <Tooltip label={infoCircle} withArrow arrowSize={10} multiline width={100}>
                   <ThemeIcon variant="light" mr={10}>
                     <BsQuestionCircle size={18} />
                   </ThemeIcon>
@@ -40,7 +40,7 @@ const Input: React.FC<Props> = ({ label, type, infoCircle, span, value, setValue
             hideControls
             rightSection={
               infoCircle && (
-                <Tooltip label={infoCircle} withArrow arrowSize={10} multiline width={200}>
+                <Tooltip label={infoCircle} withArrow arrowSize={10} multiline width={100}>
                   <ThemeIcon variant="light" mr={10}>
                     <BsQuestionCircle size={18} />
                   </ThemeIcon>

@@ -10,7 +10,10 @@ export interface StoreState {
   autolock: NumberField;
   items: { name: StringField; metadata?: StringField; remove: boolean | null }[];
   characters: StringField[];
-  groups: { name: StringField; grade: NumberField }[];
+  groups: { name: StringField; grade: NumberField; workplace?: StringField; permissions?: StringField; onduty?: boolean }[];
+  workplace?: string | null;
+  permissions?: string | null;
+  onduty?: boolean | null;
   maxDistance: NumberField;
   doorRate: NumberField;
   lockSound: StringField;
@@ -53,6 +56,9 @@ export const useStore = create<StoreState>(() => ({
   doorRate: 0,
   lockSound: '',
   unlockSound: '',
+  workplace: null,
+  permissions: null,
+  onduty: null,
   auto: false,
   state: false,
   lockpick: false,

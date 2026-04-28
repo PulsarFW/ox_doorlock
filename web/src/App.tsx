@@ -78,7 +78,15 @@ const App: React.FC = () => {
           }
         }
 
-        return setDoors(Object.values({ ...doors, [index]: data } as DoorColumn[]));
+        const updatedDoors = Object.values({ ...doors, [index]: data } as DoorColumn[]);
+        setDoors(updatedDoors);
+
+        // If the settings UI is open, refresh the form with the updated door so changes show immediately
+        if (visible) {
+          useStore.setState(convertData(data as DoorColumn), true);
+        }
+
+        return;
       }
 
       // More than 1 door sent - replace the object
