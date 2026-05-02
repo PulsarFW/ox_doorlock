@@ -252,9 +252,6 @@ local function isAuthorised(playerId, door, lockpick)
 				end
 			end
 			authorised = IsPlayerInGroup(player, groupsWithExtras) and true or nil
-		elseif not door.characters and not door.items and not door.passcode then
-			-- If no groups, no characters, no items, and no passcode are defined, allow access
-			authorised = true
 		end
 
 		if not authorised and door.items then
